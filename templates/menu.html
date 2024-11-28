@@ -1,0 +1,72 @@
+
+
+<section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end">
+    <div class="mdc-menu-surface--anchor">
+      <button class="material-icons mdc-top-app-bar__navigation-icon mdc-icon-button" id="menuButton" aria-label="Open navigation menu">menu</button>
+      <div class="mdc-menu mdc-menu-surface" style="width:250px">
+        <ul class="mdc-list" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1">
+          {% if "guardar" in opciones %}
+          <li class="mdc-list-item" role="menuitem" id="menuGuardar">
+            <span class="mdc-list-item__ripple"></span>
+            <i class="material-icons" aria-hidden="true">bookmark</i>
+            <span class="mdc-list-item__text">
+              Guardar enlace
+            </span>
+          </li>
+          {% endif %}
+          {% if "compartir" in opciones %}
+          <li class="mdc-list-divider" role="separator"></li>
+          <li class="mdc-list-item" role="menuitem" id="menuCompartir">
+            <span class="mdc-list-item__ripple"></span>
+            <i class="material-icons" aria-hidden="true">share</i>
+            <span class="mdc-list-item__text">
+              Compartir grupo
+            </span>
+          </li>
+          {% endif %}
+          {% if "salir" in opciones %}
+          <li class="mdc-list-divider" role="separator"></li>
+          <li class="mdc-list-item" role="menuitem" onclick="salir()">
+            <span class="mdc-list-item__ripple"></span>
+            <i class="material-icons" aria-hidden="true">close</i>
+            <span class="mdc-list-item__text">
+              Salir del grupo
+            </span>
+          </li>
+          {% endif %}
+          {% if "crear" in opciones %}
+          <li class="mdc-list-divider" role="separator"></li>
+          <li class="mdc-list-item" role="menuitem" onclick="crear()">
+            <span class="mdc-list-item__ripple"></span>
+            <i class="material-icons" aria-hidden="true">group_add</i>
+            <span class="mdc-list-item__text">
+              Crear nuevo grupo
+            </span>
+          </li>
+          {% endif %}
+          {% if "cambiar" in opciones %}
+          <li class="mdc-list-divider" role="separator"></li>
+          <li class="mdc-list-item mdc-list-item--disabled" role="menuitem" id="menuCambiar">
+            <span class="mdc-list-item__ripple"></span>
+            <i class="material-icons" aria-hidden="true">swap_horiz</i>
+            <span class="mdc-list-item__text">
+              Cambiar de grupo
+            </span>
+          </li>
+          {% endif %}
+          {% if "sortear" in opciones%}
+          <li class="mdc-list-divider" role="separator"></li>
+          <li class="mdc-list-item mdc-list-item--disabled" role="menuitem"  id="menuSortear">
+            <span class="mdc-list-item__ripple"></span>
+            <i class="material-icons" aria-hidden="true">casino</i>
+            <span class="mdc-list-item__text">
+              Realizar el sorteo
+            </span>
+          </li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+

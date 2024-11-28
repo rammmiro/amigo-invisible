@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% set title = "Registro" %}
+{% set barraDeBotones = false %}
+
+{% block content %}
+    <h4 class="mdc-typography--headline4">Te han invitado a participar en el amigo invisible de {{ nombreGrupo }}</h4>
+    <div class="mdc-dialog" id="dialogo-registro">
+      <form id="formulario" action="{{ url_for('registrando') }}" method="post">
+      <input type="hidden" name="group" value="{{ group }}">
+      <input type="hidden" name="nombreGrupo" value="{{ nombreGrupo }}">
+      <div class="mdc-dialog__container">
+        <div class="mdc-dialog__surface"
+          role="alertdialog"
+          aria-modal="true"
+          aria-labelledby="my-dialog-title"
+          aria-describedby="my-dialog-content">
+          <div class="mdc-dialog__content" id="dialogo">
+              <div style="margin-top:0.5em;">
+                <span class="mdc-typography--headline6">¿Cómo te llamas?</br></span>
+                <label class="mdc-text-field mdc-text-field--filled" style="width:80%;">
+                 <span class="mdc-text-field__ripple"></span>
+                 <span class="mdc-floating-label" id="nombre">
+                  Nombre
+                </span>
+                 <input class="mdc-text-field__input" type="text"
+                        name="nombre"
+                        {% if nombre is defined %}
+                          value="{{ nombre }}"
+                        {% endif %}
+                        aria-labelledby="nombre"
+                        aria-controls="my-helper-id"
+                        aria-describedby="my-helper-id"
+                        pattern="[À-ž ]{3-20}"
+                        required>
+                 <span class="mdc-line-ripple"></span>
+               </label>
+               <div class="mdc-text-field-helper-line">
+                 <div class="mdc-text-field-helper-text mdc-text-field-helper-text--validation-msg	" id="my-helper-id" aria-hidden="true">Ha de contener de 3 a 20 letras.</div>
+               </div>
+             </div>
+             <div role="progressbar" class="mdc-linear-progress mdc-linear-progress--indeterminate" aria-label="Example Progress Bar" aria-valuemin="0" aria-valuemax="1" aria-valuenow="0">
+               <div class="mdc-linear-progress__buffer">
+                 <div class="mdc-linear-progress__buffer-bar"></div>
+                 <div class="mdc-linear-progress__buffer-dots"></div>
+               </div>
+               <div class="mdc-linear-progress__bar mdc-linear-progress__primary-bar">
+                 <span class="mdc-linear-progress__bar-inner"></span>
+               </div>
+               <div class="mdc-linear-progress__bar mdc-linear-progress__secondary-bar">
+                 <span class="mdc-linear-progress__bar-inner"></span>
+               </div>
+             </div>
+          </div>
+          <div class="mdc-dialog__actions">
+            <button id="enviar" type="submit" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="accept" data-mdc-dialog-button-default disabled>
+              <div class="mdc-button__ripple"></div>
+              <span class="mdc-button__label">Enviar</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="mdc-dialog__scrim"></div>
+      </form>
+    </div>
+{% endblock content %}
+
+{% block additionalScripts %}
+  // instanciamos los mdc
+  const linearProgress = new mdc.linearProgress.MDCLinearProgress(document.querySelector('.mdc-linear-progress'));
+  const textFields = [].map.call(document.querySelectorAll('.mdc-text-field'), function(el) {
+    return new mdc.textField.MDCTextField(el);
+  });
+  const helperText = new mdc.textField.MDCTextFieldHelperText(document.querySelector('.mdc-text-field-helper-text'));
+  const dialog = new mdc.dialog.MDCDialog(document.getElementById("dialogo-registro"));
+  // esto hace que no se pueda cerrar el diálogo
+  dialog.scrimClickAction = "";
+  // esto muestra el diálogo
+  dialog.open();
+
+  // ahora activamos y desactivamos el botón
+  formulario = document.getElementById("formulario")
+  boton = document.getElementById('enviar');
+
+  formulario.addEventListener('keyup', event => {
+    // si la verificación y el negado de la deshabilitación no están en el mismo estado tenemos que cambiar la desabilitación
+    if ((formulario.checkValidity() ? 1 : 0 ) ^ (boton.hasAttribute("disabled") ? 0 : 1 )) {
+      boton.toggleAttribute("disabled");
+    }
+  });
+
+  if ((formulario.checkValidity() ? 1 : 0 ) ^ (boton.hasAttribute("disabled") ? 0 : 1 )) {
+    boton.toggleAttribute("disabled");
+  }
+
+  {% if err is defined %}
+  window.onload = function(){
+    Toastify({
+      text: "{{ err }}",
+      duration: 3000
+      }).showToast();
+  };
+
+  {% endif %}
+{% endblock additionalScripts %}

@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+{% set title = "Nuevo grupo" %}
+{% set barraDeBotones = false %}
+
+{% block content %}
+<div class="mdc-card mdc-card--outlined" style="width:90%;margin: 16px auto;">
+  <div class="mdc-card-content">
+    <h4 class="mdc-typography--headline4">Bienvenido a la web del amigo invisible</h4>
+    <p class="mdc-typography--body1">Para unirte a un grupo ya existente pide que te pasen el enlace.</p>
+    <p>
+    <button class="mdc-button mdc-button--outlined" onClick="dialog.open()">
+      <span class="mdc-button__ripple"></span>
+      <i class="material-icons mdc-button__icon" aria-hidden="true">group_add</i>
+      <span class="mdc-button__label">Crear un nuevo grupo</span>
+    </button>
+    </p>
+    <div class="mdc-dialog mdc-dialog--fullscreen" id="dialogo-registro">
+      <form id="formulario" action="{{ url_for('creando') }}" method="post">
+      <div class="mdc-dialog__container">
+        <div class="mdc-dialog__surface"
+          role="alertdialog"
+          aria-modal="true"
+          aria-labelledby="my-dialog-title"
+          aria-describedby="my-dialog-content">
+          <div class="mdc-dialog__content" id="dialogo">
+            <div style="margin-top:0.5em;">
+              <span class="mdc-typography--headline6">¿Cómo quieres llamar al grupo?</br></span>
+              <label class="mdc-text-field mdc-text-field--filled" style="width:80%;">
+               <span class="mdc-text-field__ripple"></span>
+               <span class="mdc-floating-label" id="nombreGrupo">
+                Nombre del grupo
+              </span>
+               <input class="mdc-text-field__input" type="text"
+                      name="nombreGrupo"
+                      aria-labelledby="nombre"
+                      aria-controls="my-helper-id"
+                      aria-describedby="my-helper-id"
+                      pattern="[À-ž ]{3-20}"
+                      required>
+               <span class="mdc-line-ripple"></span>
+             </label>
+             <div class="mdc-text-field-helper-line">
+               <div class="mdc-text-field-helper-text mdc-text-field-helper-text--validation-msg	" id="my-helper-id" aria-hidden="true">Ha de contener de 3 a 20 letras.</div>
+             </div>
+           </div>
+              <div style="margin-top:0.5em;">
+                <span class="mdc-typography--headline6">¿Y cómo te llamas tú?</br></span>
+                <p class="mdc-typography--body1">Este es el nombre que verá la persona que te va a hacer el regalo, ¡usa el nombre o apodo por el que te conozcan!</p>
+                <label class="mdc-text-field mdc-text-field--filled" style="width:80%;">
+                 <span class="mdc-text-field__ripple"></span>
+                 <span class="mdc-floating-label" id="nombre">
+                  {% if nombre is defined %}
+                    {{ nombre }}
+                  {% else %}
+                    Nombre
+                  {% endif %}
+                </span>
+                 <input class="mdc-text-field__input" type="text"
+                        name="nombre"
+                        aria-labelledby="nombre"
+                        aria-controls="my-helper-id"
+                        aria-describedby="my-helper-id"
+                        pattern="[À-ž ]{3-20}"
+                        required>
+                 <span class="mdc-line-ripple"></span>
+               </label>
+               <div class="mdc-text-field-helper-line">
+                 <div class="mdc-text-field-helper-text mdc-text-field-helper-text--validation-msg	" id="my-helper-id" aria-hidden="true">Ha de contener de 3 a 20 letras.</div>
+               </div>
+             </div>
+             <div style="margin-top:0.5em;">
+              <span class="mdc-typography--headline6">Excluidos:</br></span>
+              <p class="mdc-typography--body1">
+                Puedes permitir que los participantes excluyan tres, dos o un miembro del grupo entre sus posibilidades (por ejemplo para evitar que te toque la misma persona del año pasado). Si seleccionas 0 el sorteo será completamente al azar.
+              </p>
+              <div class="mdc-slider mdc-slider--discrete mdc-slider--tick-marks">
+                <input class="mdc-slider__input" type="range" min="0" max="3" value="0" name="maxBan" step="1" aria-label="Discrete slider with tick marks">
+                <div class="mdc-slider__track">
+                  <div class="mdc-slider__track--inactive"></div>
+                  <div class="mdc-slider__track--active">
+                    <div class="mdc-slider__track--active_fill"></div>
+                  </div>
+                  <div class="mdc-slider__tick-marks">
+                    <div class="mdc-slider__tick-mark--inactive"></div>
+                    <div class="mdc-slider__tick-mark--inactive"></div>
+                    <div class="mdc-slider__tick-mark--inactive"></div>
+                  </div>
+                </div>
+                <div class="mdc-slider__thumb">
+                  <div class="mdc-slider__value-indicator-container" aria-hidden="true">
+                    <div class="mdc-slider__value-indicator">
+                      <span class="mdc-slider__value-indicator-text">
+                        0
+                      </span>
+                    </div>
+                  </div>
+                  <div class="mdc-slider__thumb-knob"></div>
+                </div>
+              </div>
+             </div>
+             <div role="progressbar" class="mdc-linear-progress mdc-linear-progress--indeterminate" aria-label="Example Progress Bar" aria-valuemin="0" aria-valuemax="1" aria-valuenow="0">
+               <div class="mdc-linear-progress__buffer">
+                 <div class="mdc-linear-progress__buffer-bar"></div>
+                 <div class="mdc-linear-progress__buffer-dots"></div>
+               </div>
+               <div class="mdc-linear-progress__bar mdc-linear-progress__primary-bar">
+                 <span class="mdc-linear-progress__bar-inner"></span>
+               </div>
+               <div class="mdc-linear-progress__bar mdc-linear-progress__secondary-bar">
+                 <span class="mdc-linear-progress__bar-inner"></span>
+               </div>
+             </div>
+          </div>
+          <div class="mdc-dialog__actions">
+            <button id="enviar" type="submit" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="accept" data-mdc-dialog-button-default disabled>
+              <div class="mdc-button__ripple"></div>
+              <span class="mdc-button__label">Enviar</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="mdc-dialog__scrim"></div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block additionalScripts %}
+  // instanciamos los mdc
+  const slider = new mdc.slider.MDCSlider(document.querySelector('.mdc-slider'));
+  const buttonRipple = new mdc.ripple.MDCRipple(document.querySelector('.mdc-button'));
+  const linearProgress = new mdc.linearProgress.MDCLinearProgress(document.querySelector('.mdc-linear-progress'));
+  const textFields = [].map.call(document.querySelectorAll('.mdc-text-field'), function(el) {
+    return new mdc.textField.MDCTextField(el);
+  });
+  const helperText = new mdc.textField.MDCTextFieldHelperText(document.querySelector('.mdc-text-field-helper-text'));
+  const dialog = new mdc.dialog.MDCDialog(document.getElementById("dialogo-registro"));
+  // esto hace que no se pueda cerrar el diálogo
+  // dialog.scrimClickAction = "";
+  // esto muestra el diálogo
+  // dialog.open();
+  dialog.close();
+
+  // ahora activamos y desactivamos el botón
+  formulario = document.getElementById("formulario")
+  boton = document.getElementById('enviar');
+
+  formulario.addEventListener('keyup', event => {
+    // si la verificación y el negado de la deshabilitación no están en el mismo estado tenemos que cambiar la desabilitación
+    if ((formulario.checkValidity() ? 1 : 0 ) ^ (boton.hasAttribute("disabled") ? 0 : 1 )) {
+      boton.toggleAttribute("disabled");
+    }
+  });
+
+  {% if err is defined %}
+  window.onload = function(){
+    Toastify({
+      text: "{{ err }}",
+      duration: 3000
+      }).showToast();
+      dialog.open();
+  };
+
+  {% endif %}
+{% endblock additionalScripts %}
+

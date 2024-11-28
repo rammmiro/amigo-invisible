@@ -1,0 +1,104 @@
+{% set title = "Amigo Invisible" %}
+{% set barraDeBotones = barraDeBotones | default(true) %}
+
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="/static/styles.css">
+    <!-- Required Material Web JavaScript library -->
+    <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href="static/images/favicon-32.png">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+  </head>
+  <body class="mdc-typography">
+    {# barra superior #}
+    <header class="mdc-top-app-bar">
+    <div class="mdc-top-app-bar__row">
+      <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
+        <button class="material-icons mdc-top-app-bar__navigation-icon mdc-icon-button" aria-label="Open navigation menu">card_giftcard</button>
+        <span class="mdc-top-app-bar__title">Amigo Invisible</span>
+      </section>
+      {% block menu %}
+      {% endblock menu %}
+    </div>
+    </header>
+    {# end barra superior #}
+
+
+
+    {% if barraDeBotones %}
+      <div class="barraDeBotones">
+        <button class="mdc-fab" aria-label="Reload" style="background-size:70%;" id="reload">
+          <div class="mdc-fab__ripple"></div>
+          <span class="mdc-fab__icon material-icons" id="reloadIcon">refresh</span>
+        </button>
+      </div>
+    {% endif %}
+
+    <main class="mdc-top-app-bar--fixed-adjust">
+
+    {% block content %}
+
+    {% endblock content %}
+
+    </main>
+
+    <script type=text/javascript>
+      /* Instanciamos los componentes de material design */
+      const topAppBar = new mdc.topAppBar.MDCTopAppBar(document.querySelector('.mdc-top-app-bar'));
+      
+      function getCookie(cname) {
+        let name = cname + "=";
+        let decodedCookie = decodeURIComponent(document.cookie);
+        let ca = decodedCookie.split(';');
+        for(let i = 0; i <ca.length; i++) {
+          let c = ca[i];
+          while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+          }
+          if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+          }
+        }
+        return "";
+      }
+
+      function setCookie(cname, cvalue, exdays) {
+        const d = new Date();
+        d.setTime(d.getTime() + (exdays*24*60*60*1000));
+        let expires = "expires="+ d.toUTCString();
+        document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+      }
+
+      {% if barraDeBotones %}
+        // hay que inicializarlas así como vector porque son varias
+        const fabs = [].map.call(document.querySelectorAll('.mdc-fab'), function(el) {
+          return new mdc.ripple.MDCRipple(el);
+        });
+
+        /* probamos las notificaciones con el botón de actualizar */
+        var rot=360;
+        botonReload = document.getElementById("reload")
+        if (botonReload) {
+          botonReload.addEventListener("click", function(){
+            botonReload.children[1].style = "transform: rotate(" + rot + "deg)";
+            rot += 360;
+            actualizar();
+          });
+        }
+      {% endif %}
+
+      {% block additionalScripts %}
+        function actualizar(){};
+      {% endblock additionalScripts %}
+    </script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+  </body>
+</html>

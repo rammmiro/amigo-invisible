@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% set title = "Consulta" %}
+{% set barraDeBotones = false %}
+
+{% block content %}
+    <div class="mdc-dialog" id="dialogo-registro">
+      <form id="formulario" action="javascript:decision()" method="post">
+      <input type="hidden" name="grupo" value="{{ grupo }}"">
+      <div class="mdc-dialog__container">
+        <div class="mdc-dialog__surface"
+          role="alertdialog"
+          aria-modal="true"
+          aria-labelledby="my-dialog-title"
+          aria-describedby="my-dialog-content">
+          <div class="mdc-dialog__content" id="dialogo">
+              <div style="margin-top:0.5em;">
+                <span class="mdc-typography--headline6">
+                {% if tipo=="usuario" %}
+                  Has usado un enlace nuevo,
+                {% else %}
+                  Te has apuntado a varios grupos,
+                {% endif %}
+                <br>¿con qué {{ tipo }} quieres participar?</br></span>
+                
+                {% for opcion in decisiones %}
+                <div class="mdc-form-field" style="display:flex">
+                    <div class="mdc-radio">
+                      <input class="mdc-radio__native-control" type="radio" id="{{opcion['id']}}" name="radios" value="{{opcion['id']}}">
+                      <div class="mdc-radio__background">
+                        <div class="mdc-radio__outer-circle"></div>
+                        <div class="mdc-radio__inner-circle"></div>
+                      </div>
+                      <div class="mdc-radio__ripple"></div>
+                    </div>
+                    <label for="{{ opcion['id'] }}">{{ opcion['nombre'] }}</label>
+                  </div>
+                  {% endfor %}
+             </div>
+             <div role="progressbar" class="mdc-linear-progress mdc-linear-progress--indeterminate" aria-label="Example Progress Bar" aria-valuemin="0" aria-valuemax="1" aria-valuenow="0">
+               <div class="mdc-linear-progress__buffer">
+                 <div class="mdc-linear-progress__buffer-bar"></div>
+                 <div class="mdc-linear-progress__buffer-dots"></div>
+               </div>
+               <div class="mdc-linear-progress__bar mdc-linear-progress__primary-bar">
+                 <span class="mdc-linear-progress__bar-inner"></span>
+               </div>
+               <div class="mdc-linear-progress__bar mdc-linear-progress__secondary-bar">
+                 <span class="mdc-linear-progress__bar-inner"></span>
+               </div>
+             </div>
+             <div class="mdc-dialog__actions">
+              <button id="enviar" type="submit" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="accept" data-mdc-dialog-button-default disabled>
+                <div class="mdc-button__ripple"></div>
+                <span class="mdc-button__label">Enviar</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mdc-dialog__scrim"></div>
+      </form>
+    </div>
+{% endblock content %}
+
+{% block additionalScripts %}
+  // instanciamos los mdc
+  const linearProgress = new mdc.linearProgress.MDCLinearProgress(document.querySelector('.mdc-linear-progress'));
+  mdc.autoInit();
+
+  const dialog = new mdc.dialog.MDCDialog(document.getElementById("dialogo-registro"));
+  // esto hace que no se pueda cerrar el diálogo
+  dialog.scrimClickAction = "";
+  // esto muestra el diálogo
+  dialog.open();
+
+  // ahora activamos y desactivamos el botón
+  formulario = document.getElementById("formulario")
+  boton = document.getElementById('enviar');
+
+  if (document.querySelector('input[name="radios"]')) {
+    document.querySelectorAll('input[name="radios"]').forEach((elem) => {
+      elem.addEventListener("change", function(event) {
+        boton.removeAttribute("disabled");
+      });
+    });
+  }
+
+
+
+  function decision() {
+    d = document.querySelector('input[name="radios"]:checked').value;
+    setCookie(("{{tipo}}"=="usuario") ? "user" : "group", d, 3*(("{{tipo}}"=="usuario") ? 30 : 1))
+    
+    if ("{{tipo}}"=="grupo") {
+      window.location.href = window.location.pathname;
+    } else {
+      group = params = new URLSearchParams(window.location.search).get("group");
+      if (group) {
+        window.location.href = window.location.pathname + "?group=" + group;
+      } else {
+        window.location.href = window.location.pathname;
+      }
+    }
+  }
+
+{% endblock additionalScripts %}

@@ -1,0 +1,73 @@
+.mdc-card h4, .mdc-card h6, .mdc-card p {
+  margin: 8px 16px;
+}
+
+.mdc-card-content {
+  padding: 16px;
+}
+
+.mdc-text-field {
+  margin: 8px;
+}
+
+.barraDeBotones{
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  z-index: 10;
+}
+
+.mdc-top-app-bar{
+  position: absolute;
+  top: 0;
+  left:0;
+}
+
+.mdc-fab {
+  float: right;
+  margin: 5px;
+}
+
+.mdc-fab--touch, .mdc-fab, .mdc-fab__icon {
+  font-size: 150%  !important;
+}
+
+
+.mdc-fab__primary {
+  background-color: var(--mdc-theme-primary, #6200ee);
+}
+
+#reloadIcon {
+  transition: 0.5s ease-in-out;
+}
+
+
+.mdc-list-item, .mdc-list-item__text {
+  height: 32px !important;
+  display: flex;
+  align-items: center;
+}
+
+.mdc-linear-progress{
+  margin: 8px 0;
+}
+
+/* ordenamos la lista colocando primero los vivos */
+#censo {
+    display: flex;
+    flex-direction: column;
+}
+.vivo {
+    order: -1;
+}
+.muerto {
+    order: 1;
+    color: rgba(0, 0, 0, 0.6);
+}
+#censo.mdc-list-divider {
+    order: 0;
+}
+
+.mdc-menu .material-icons {
+  margin:4px;
+}

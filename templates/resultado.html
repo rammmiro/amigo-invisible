@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% set title = "Resultado" %}
+{% set barraDeBotones = false %}
+
+{% block menu %}
+  {% with opciones=["guardar", "cambiar"] %}
+    {% include 'menu.html' %}
+  {% endwith %}
+{% endblock menu %}
+
+{% block content %}
+  <div class="mdc-card mdc-card--outlined" style="width:90%;margin: 16px auto;">
+    <div class="mdc-card-content">
+      <h4 class="mdc-typography--headline4">¡Hola {{ nombre }}!</h4>
+      <p class="mdc-typography--body1">Te ha tocado {{ siguiente }} en el amigo invisible de {{ nombreGrupo }}.</p>
+    </div>
+  </div>
+{% endblock content %}
+
+{% block additionalScripts %}
+    $SCRIPT_ROOT = {{ request.script_root|tojson }};
+
+    const menu = new mdc.menu.MDCMenu(document.querySelector('.mdc-menu'));
+    const menuSurface = new mdc.menuSurface.MDCMenuSurface(document.querySelector('.mdc-menu-surface'));
+    menu.setAnchorCorner(mdc.menuSurface.Corner.BOTTOM_LEFT);
+    buttonMenu = document.getElementById("menuButton")
+    buttonMenu.addEventListener("click", () => {
+      menu.open = !menu.open;
+      // Stop the click event from reaching the toggle element so that the toggle click handler
+      // isn't run. The menu will be closed first by the handler registered in the MCDMenuSurface component
+      document.body.addEventListener('click', (e) => {
+        if (buttonMenu.contains(e.target)) {
+          e.stopPropagation()
+        }
+      }, { capture: true, once: true })
+    });
+
+    const encodeGetParams = p => Object.entries(p).map(kv => kv.map(encodeURIComponent).join("=")).join("&");
+
+    document.getElementById("menuGuardar").addEventListener("click", function(){
+      const params = {
+        user: getCookie("user"),
+        group: getCookie("group")
+      };
+      url = "{{ request.url }}".split("?")[0] + "?" + encodeGetParams(params);
+      navigator.clipboard.writeText(url);
+      Toastify({
+        text: "Enlace copiado al portapapeles",
+        duration: 4000
+        }).showToast();
+    });
+
+
+    document.getElementById("menuCambiar").addEventListener("click", function(){
+      // primero se consulta si hay más de un grupo
+      $.getJSON($SCRIPT_ROOT + '/_consultaGrupos', {
+        user: getCookie("user")
+      }, function(data) {
+        console.log(data.respuesta)
+        if (data.respuesta) {
+          // si los hay se borra la cookie y se reinicia
+          setCookie("group","null",-1);
+          window.location = window.location.href.split("?")[0];
+        } else {
+          // si no los hay se explica
+          Toastify({
+            text: "No estás registrado en más grupos",
+            duration: 4000
+            }).showToast();
+        }
+      });
+    });
+
+
+
+{% endblock additionalScripts %}

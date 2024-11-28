@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+{% set title = "Espera" %}
+{% set barraDeBotones = True %}
+
+{% block menu %}
+  {% with opciones=["guardar", "compartir", "cambiar"] %}
+  {% if creador %}
+  {% set opciones = opciones + ["sortear"] %}
+  {% endif %}
+    {% include 'menu.html' %}
+  {% endwith %}
+{% endblock menu %}
+
+{% block content %}
+  <div class="mdc-card mdc-card--outlined" style="width:90%;margin: 16px auto;">
+  <div class="mdc-card-content">
+    <h4 class="mdc-typography--headline4">¡Hola {{ nombre }}!</h4>
+    <p class="mdc-typography--body1">Estamos esperando a que se apunten el resto de participantes de {{ nombreGrupo }} para hacer el sorteo.</p>
+    {% if maxBan | int > 0 %}
+        <p class="mdc-typography--body1">Indica a quién hicieste un regalo la última vez para que no se repita.</p>
+    {% endif %}
+        <ul id="censo" class="mdc-list mdc-list--icon-list">
+          {% for participante in censo %}
+            {% if participante["nombre"] != nombre %}
+              {% if participante["id"] in excluidos %}
+                <li class="muerto mdc-list-item" id="{{participante['id']}}" onClick="baneando('{{ participante["id"] }}')"> <i class="material-icons" aria-hidden="true">person_off</i>
+              {% else %}
+                <li class="vivo mdc-list-item" id="{{participante['id']}}" onClick="baneando('{{ participante["id"] }}')"> <i class="material-icons" aria-hidden="true">person</i>
+              {% endif %}
+              <span class="mdc-list-item__ripple"></span>
+              <span class="mdc-list-item__text">{{ participante["nombre"] }}</span>
+            {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+    
+  </div>
+  </div>
+{% endblock content %}
+
+{% block additionalScripts %}
+    $SCRIPT_ROOT = {{ request.script_root|tojson }};
+
+    const menu = new mdc.menu.MDCMenu(document.querySelector('.mdc-menu'));
+    const menuSurface = new mdc.menuSurface.MDCMenuSurface(document.querySelector('.mdc-menu-surface'));
+    menu.setAnchorCorner(mdc.menuSurface.Corner.BOTTOM_LEFT);
+    buttonMenu = document.getElementById("menuButton")
+    buttonMenu.addEventListener("click", () => {
+      menu.open = !menu.open;
+      // Stop the click event from reaching the toggle element so that the toggle click handler
+      // isn't run. The menu will be closed first by the handler registered in the MCDMenuSurface component
+      document.body.addEventListener('click', (e) => {
+        if (buttonMenu.contains(e.target)) {
+          e.stopPropagation()
+        }
+      }, { capture: true, once: true })
+    });
+
+    const encodeGetParams = p => Object.entries(p).map(kv => kv.map(encodeURIComponent).join("=")).join("&");
+
+    document.getElementById("menuGuardar").addEventListener("click", function(){
+      const params = {
+        user: getCookie("user"),
+        group: getCookie("group")
+      };
+      url = "{{ request.url }}".split("?")[0] + "?" + encodeGetParams(params);
+      navigator.clipboard.writeText(url);
+      Toastify({
+        text: "Enlace copiado al portapapeles",
+        duration: 4000
+        }).showToast();
+    });
+
+    document.getElementById("menuCompartir").addEventListener("click", function(){
+      const params = {
+        group: getCookie("group")
+      };
+      url = "{{ request.url }}".split("?")[0] + "?" + encodeGetParams(params);
+      navigator.clipboard.writeText(url);
+      Toastify({
+        text: "Enlace copiado al portapapeles",
+        duration: 4000
+        }).showToast();
+    });
+
+    function salir(){
+      
+    }
+
+    function crear(){
+      
+    }
+
+    document.getElementById("menuCambiar").addEventListener("click", function(){
+      // primero se consulta si hay más de un grupo
+      $.getJSON($SCRIPT_ROOT + '/_consultaGrupos', {
+        user: getCookie("user")
+      }, function(data) {
+        console.log(data.respuesta)
+        if (data.respuesta) {
+          // si los hay se borra la cookie y se reinicia
+          setCookie("group","null",-1);
+          window.location = window.location.href.split("?")[0];
+        } else {
+          // si no los hay se explica
+          Toastify({
+            text: "No estás registrado en más grupos",
+            duration: 4000
+            }).showToast();
+        }
+      });
+    });
+
+    document.getElementById("menuSortear").addEventListener("click", function(){
+      $.getJSON($SCRIPT_ROOT + '/_sortear', {
+        user: getCookie("user"),
+        group: getCookie("group"),
+      }, function(data) {
+        console.log(data.respuesta)
+        if (data.respuesta) {
+          // si el sorteo es correcto se reinicia
+          window.location = window.location.href.split("?")[0];
+        } else {
+          // si no se explica
+          Toastify({
+            text: "Se ha producido un error durante el sorteo",
+            duration: 4000
+            }).showToast();
+        }
+      });
+    });
+
+
+    const list = new mdc.list.MDCList(document.querySelector('.mdc-list'));
+    const listItemRipples = list.listElements.map((listItemEl) => new mdc.ripple.MDCRipple(listItemEl));
+
+    lista = document.getElementById("censo")
+
+    function baneando(exc){
+      $.getJSON($SCRIPT_ROOT + '/_actualizar', {
+          user: getCookie("user"),
+          group: getCookie("group"),
+          excluido: exc,
+        }, function(data) {
+          console.log("excluidos " + data.excluidos)
+          // si tenemos que recargar
+          if (data.refresh) {
+            window.location.reload(true);
+          }
+          // cambiar la clase de la lista de jugadores
+          for (participante in data.censo) {
+            console.log("participante "+data.censo[participante]["nombre"]+" "+data.censo[participante]["id"])
+            item = document.getElementById(data.censo[participante]["id"]);
+            if (item) {
+              // cambiamos la clase
+              console.log("cambio de clase")
+              item.className = (data.excluidos.includes(data.censo[participante]["id"]) ? "muerto mdc-list-item" : "vivo mdc-list-item")
+              // y el icono
+              item.firstElementChild.innerHTML = (data.excluidos.includes(data.censo[participante]["id"]) ? "person_off" : "person")
+            } else {
+              console.log("nuevo participante")
+              // creamos el elemento
+              item = document.createElement("li");
+              item.className = (data.excluidos.includes(participante["id"]) ? "muerto mdc-list-item" : "vivo mdc-list-item")
+              item.id = data.censo[participante]["id"];
+              item.onclick= function(){baneando(data.censo[participante]["id"])};
+              icon = document.createElement("i");
+              icon.className = "material-icons"
+              icon.setAttribute('aria-hidden', 'true')
+              icon.innerHTML = (data.excluidos.includes(participante['id']) ? "person_off" : "person")
+              item.appendChild(icon);
+              r = document.createElement("span");
+              r.className = "mdc-list-item__ripple";
+              item.appendChild(r);
+              n = document.createElement("span");
+              n.className = "mdc-list-item__text";
+              n.innerHTML = data.censo[participante]["nombre"];
+              item.appendChild(n);
+              censo.appendChild(item);
+            }
+          }
+          // y borramos los que ya no existan
+          $(censo).children('li').each(function(item) {
+              console.log($(this).attr('id'));
+            
+            if (!data.censo.map( item => { return item.id }).includes($(this).attr('id'))) {
+              $(this).find(":first-child").remove();
+              $(this).remove();
+            }
+            
+          });
+        });
+    };
+
+    function actualizar(){
+      baneando("0");
+    };
+
+{% endblock additionalScripts %}
