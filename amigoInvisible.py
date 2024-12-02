@@ -17,7 +17,7 @@ config = yaml.safe_load(open(os.path.join(__location__,"config.yml")))
 app = flask.Flask(__name__)
 
 # Initialize database
-client = MongoClient(config["mongo"])
+client = MongoClient(config["mongo"],authMechanism="MONGODB-X509",tls=True,tlsCertificateKeyFile=config["certificate"],authSource="$external")
 db = client.amigoInvisible
 amigos = db.amigos
 grupos = db.grupos
