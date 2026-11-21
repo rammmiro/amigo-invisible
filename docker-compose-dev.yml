@@ -1,0 +1,23 @@
+services:
+  mongo:
+    image: mongo:8
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+      - ./dev/mongo/init.js:/docker-entrypoint-initdb.d/init.js:ro
+
+  web:
+    build: .
+    working_dir: /app
+    volumes:
+      - .:/app
+      - ./config.dev.yml:/app/config.yml:ro
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mongo
+
+volumes:
+  mongo_data:

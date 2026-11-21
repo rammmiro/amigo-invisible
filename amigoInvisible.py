@@ -17,7 +17,10 @@ config = yaml.safe_load(open(os.path.join(__location__,"config.yml")))
 app = flask.Flask(__name__)
 
 # Initialize database
-client = MongoClient(config["mongo"],authMechanism="MONGODB-X509",tls=True,tlsCertificateKeyFile=config["certificate"],authSource="$external")
+if "certificate" in config:
+  client = MongoClient(config["mongo"],authMechanism="MONGODB-X509",tls=True,tlsCertificateKeyFile=config["certificate"],authSource="$external")
+else:
+  client = MongoClient(config["mongo"])
 db = client.amigoInvisible
 amigos = db.amigos
 grupos = db.grupos
