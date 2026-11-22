@@ -230,6 +230,26 @@ def sorteo():
         return flask.jsonify({"respuesta":False})
     pass
 
+@app.route('/_salir',methods = ['GET'])
+def salir():
+    user = flask.request.args.get('user')
+    group = flask.request.args.get('group')
+    try:
+        amigo = amigos.find_one({"user":user, "group":group})
+        grupo = grupos.find_one({"group":group})
+        if amigo["siguiente"] is not None:
+            raise ValueError("Ya se ha realizado el sorteo")
+        else:
+            # se borra el grupo del usuario
+            amigos.delete_one({"user":user, "group":group})
+            if (grupo["creador"] == amigo["user"]):
+                # sale el creador, se borra el grupo completo
+                amigos.delete_many({"group":group})
+                grupos.delete_one({"group":group})
+            return flask.jsonify({"respuesta":True})
+    except:
+        return flask.jsonify({"respuesta":False})
+
 @app.route('/_consultaGrupos',methods = ['GET'])
 def consultaGrupos():
     user = flask.request.args.get('user')

@@ -3,7 +3,7 @@
 {% set barraDeBotones = True %}
 
 {% block menu %}
-  {% with opciones=["guardar", "compartir", "cambiar"] %}
+  {% with opciones=["guardar", "compartir", "cambiar", "salir"] %}
   {% if creador %}
   {% set opciones = opciones + ["sortear"] %}
   {% endif %}
@@ -84,7 +84,22 @@
     });
 
     function salir(){
-      
+      $.getJSON($SCRIPT_ROOT + '/_salir', {
+        user: getCookie("user"),
+        group: getCookie("group"),
+      }, function(data) {
+        console.log(data.respuesta)
+        if (data.respuesta) {
+          // si sale correctamente se reinicia
+          window.location = window.location.href.split("?")[0];
+        } else {
+          // si no se explica
+          Toastify({
+            text: "Se ha producido un error al salir del grupo",
+            duration: 4000
+            }).showToast();
+        }
+      });
     }
 
     function crear(){
