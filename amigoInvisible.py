@@ -128,6 +128,9 @@ def registrando():
     # si el nombre está escogido repetir y mostrar una notificacion toast
     if amigos.find_one({"nombre":data["nombre"],"group":data["group"]}):
         return flask.render_template('registro.html',group=data["group"],nombreGrupo=data["nombreGrupo"],err="Ya hay alguien con ese nombre en este grupo")
+    # si el sorteo ya se ha realizado no se puede registrar nadie más
+    if amigos.find_one({"group":data["group"],"siguiente":{"$ne":None}}):
+        return flask.render_template('registro.html',group=data["group"],nombreGrupo=data["nombreGrupo"],err="Ya se ha realizado el sorteo, no se puede registrar nadie más")
     # si el nombre es nuevo lo agregamos a la lista
     user = flask.request.cookies.get('user')
     if user is None:
