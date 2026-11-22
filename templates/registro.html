@@ -92,6 +92,10 @@
     boton.toggleAttribute("disabled");
   }
 
+  formulario.addEventListener('submit', () => {
+    boton.disabled = true;
+  });
+
   {% if err is defined %}
   window.onload = function(){
     Toastify({
