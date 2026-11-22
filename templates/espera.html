@@ -10,7 +10,6 @@
     {% include 'menu.html' %}
   {% endwith %}
 {% endblock menu %}
-
 {% block content %}
   <div class="mdc-card mdc-card--outlined" style="width:90%;margin: 16px auto;">
   <div class="mdc-card-content">
@@ -36,10 +35,35 @@
     
   </div>
   </div>
+  <div class="mdc-dialog" id="dialogo-salir">
+    <div class="mdc-dialog__container">
+      <div class="mdc-dialog__surface"
+        role="alertdialog"
+        aria-modal="true"
+        aria-labelledby="titulo-dialogo-salir"
+        aria-describedby="contenido-dialogo-salir">
+        <h2 class="mdc-dialog__title" id="titulo-dialogo-salir">Salir del grupo</h2>
+        <div class="mdc-dialog__content" id="contenido-dialogo-salir">
+          ¿Seguro que quieres salir de {{ nombreGrupo }}?
+        </div>
+        <div class="mdc-dialog__actions">
+          <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="close">
+            <span class="mdc-button__label">Cancelar</span>
+          </button>
+          <button type="button" class="mdc-button mdc-dialog__button mdc-button--raised" id="confirmarSalir">
+            <span class="mdc-button__label">Salir</span>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="mdc-dialog__scrim"></div>
+  </div>
 {% endblock content %}
 
 {% block additionalScripts %}
     $SCRIPT_ROOT = {{ request.script_root|tojson }};
+
+    const dialogoSalir = new mdc.dialog.MDCDialog(document.getElementById("dialogo-salir"));
 
     const menu = new mdc.menu.MDCMenu(document.querySelector('.mdc-menu'));
     const menuSurface = new mdc.menuSurface.MDCMenuSurface(document.querySelector('.mdc-menu-surface'));
@@ -84,6 +108,11 @@
     });
 
     function salir(){
+      dialogoSalir.open();
+    }
+
+    function confirmarSalir(){
+      dialogoSalir.close();
       $.getJSON($SCRIPT_ROOT + '/_salir', {
         user: getCookie("user"),
         group: getCookie("group"),
@@ -101,6 +130,8 @@
         }
       });
     }
+
+    document.getElementById("confirmarSalir").addEventListener("click", confirmarSalir);
 
     function crear(){
       
